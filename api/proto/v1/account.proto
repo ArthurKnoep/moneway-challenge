@@ -1,0 +1,15 @@
+syntax = "proto3";
+package v1;
+
+message CreateRequest {
+    string username = 1;
+    string currency = 2;
+}
+
+message CreateResponse {
+    string account_uuid = 1;
+}
+
+service AccountService {
+    rpc CreateAccount(CreateRequest) returns(CreateResponse);
+}

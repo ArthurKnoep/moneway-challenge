@@ -13,5 +13,5 @@ func NewBalanceServiceServer() v1.BalanceServiceServer {
 }
 
 func (s *balanceServiceServer) GetBalance(ctx context.Context, request *v1.BalanceRequest) (*v1.BalanceResult, error) {
-
+	return nil, nil
 }
