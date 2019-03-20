@@ -23,7 +23,7 @@ func (s *accountServiceServer) CreateAccount(ctx context.Context, req *v1.Create
 	if len(req.Username) == 0 || len(req.Currency) < 3 {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid username or currency")
 	}
-	if exist, err := account.AlreadyExist(s.dbSession, req.Username); err != nil {
+	if exist, err := account.UsernameExist(s.dbSession, req.Username); err != nil {
 		return nil, status.Errorf(codes.Unknown, "Unable to check the account")
 	} else if exist == true {
 		return nil, status.Errorf(codes.AlreadyExists, "Account already exist")
@@ -34,6 +34,23 @@ func (s *accountServiceServer) CreateAccount(ctx context.Context, req *v1.Create
 			return &v1.CreateResponse{
 				AccountUuid: rst.AccountUUID.String(),
 			}, nil
+		}
+	}
+}
+
+func (s *accountServiceServer) DeleteAccount(ctx context.Context, req *v1.DeleteRequest) (*v1.DeleteResponse, error) {
+	if len(req.AccountUuid) == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid username or currency")
+	}
+	if exist, err := account.AccountIdExist(s.dbSession, req.AccountUuid); err != nil {
+		return nil, status.Errorf(codes.Unknown, "Unable to delete the account")
+	} else if exist == false {
+		return nil, status.Errorf(codes.NotFound, "Account not found")
+	} else {
+		if err := account.DeleteAccount(s.dbSession, req.AccountUuid); err != nil {
+			return nil, status.Errorf(codes.Unknown, "Unable to delete the account")
+		} else {
+			return &v1.DeleteResponse{}, nil
 		}
 	}
 }

@@ -10,6 +10,14 @@ message CreateResponse {
     string account_uuid = 1;
 }
 
+message DeleteRequest {
+    string account_uuid = 1;
+}
+
+message DeleteResponse {
+}
+
 service AccountService {
     rpc CreateAccount(CreateRequest) returns(CreateResponse);
+    rpc DeleteAccount(DeleteRequest) returns(DeleteResponse);
 }

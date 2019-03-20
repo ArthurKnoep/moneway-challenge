@@ -1,6 +1,7 @@
 package account
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/gocql/gocql"
@@ -29,7 +30,7 @@ func CreateTable(session *gocql.Session) error {
 	return q.Exec()
 }
 
-func AlreadyExist(session *gocql.Session, accountName string) (bool, error) {
+func UsernameExist(session *gocql.Session, accountName string) (bool, error) {
 	stmt, names := qb.Select(TableName).Where(qb.Eq("username")).AllowFiltering().ToCql()
 	q := gocqlx.Query(session.Query(stmt), names).BindStruct(Account{
 		Username: accountName,
@@ -39,6 +40,22 @@ func AlreadyExist(session *gocql.Session, accountName string) (bool, error) {
 		return false, err
 	}
 	return len(accounts) != 0, nil
+}
+
+func AccountIdExist(session *gocql.Session, accountUuid string) (bool, error) {
+	stmt, names := qb.Select(TableName).Where(qb.Eq("account_uuid")).AllowFiltering().ToCql()
+	if uuid, err := gocql.ParseUUID(accountUuid); err != nil {
+		return false, errors.New("invalid account id")
+	} else {
+		q := gocqlx.Query(session.Query(stmt), names).BindStruct(Account{
+			AccountUUID: uuid,
+		})
+		var accounts []Account
+		if err := q.SelectRelease(&accounts); err != nil {
+			return false, err
+		}
+		return len(accounts) != 0, nil
+	}
 }
 
 func CreateAccount(session *gocql.Session, account, currency string) (*Account, error) {
@@ -54,4 +71,16 @@ func CreateAccount(session *gocql.Session, account, currency string) (*Account, 
 		return nil, err
 	}
 	return &a, nil
+}
+
+func DeleteAccount(session *gocql.Session, accountUuid string) error {
+	stmt, names := qb.Delete(TableName).Where(qb.Eq("account_uuid")).ToCql()
+	if uuid, err := gocql.ParseUUID(accountUuid); err != nil {
+		return errors.New("invalid account id")
+	} else {
+		q := gocqlx.Query(session.Query(stmt), names).BindStruct(Account{
+			AccountUUID: uuid,
+		})
+		return q.ExecRelease()
+	}
 }
