@@ -22,7 +22,7 @@ func RunServer() error {
 	defer session.Close()
 
 	return grpc.RunServer(ctx,
-		v1.NewBalanceServiceServer(),
 		v1.NewAccountServiceServer(session),
+		v1.NewBalanceServiceServer(session),
 		cfg.Port)
 }

@@ -42,13 +42,13 @@ func (s *accountServiceServer) DeleteAccount(ctx context.Context, req *v1.Delete
 	if len(req.AccountUuid) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid username or currency")
 	}
-	if exist, err := account.AccountIdExist(s.dbSession, req.AccountUuid); err != nil {
-		return nil, status.Errorf(codes.Unknown, "Unable to delete the account")
+	if exist, err := account.UuidExist(s.dbSession, req.AccountUuid); err != nil {
+		return nil, status.Errorf(codes.Unknown, "Check exist: %v", err)
 	} else if exist == false {
 		return nil, status.Errorf(codes.NotFound, "Account not found")
 	} else {
 		if err := account.DeleteAccount(s.dbSession, req.AccountUuid); err != nil {
-			return nil, status.Errorf(codes.Unknown, "Unable to delete the account")
+			return nil, status.Errorf(codes.Unknown, "Delete: %v", err)
 		} else {
 			return &v1.DeleteResponse{}, nil
 		}

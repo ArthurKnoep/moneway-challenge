@@ -42,7 +42,7 @@ func UsernameExist(session *gocql.Session, accountName string) (bool, error) {
 	return len(accounts) != 0, nil
 }
 
-func AccountIdExist(session *gocql.Session, accountUuid string) (bool, error) {
+func UuidExist(session *gocql.Session, accountUuid string) (bool, error) {
 	stmt, names := qb.Select(TableName).Where(qb.Eq("account_uuid")).AllowFiltering().ToCql()
 	if uuid, err := gocql.ParseUUID(accountUuid); err != nil {
 		return false, errors.New("invalid account id")
@@ -71,6 +71,22 @@ func CreateAccount(session *gocql.Session, account, currency string) (*Account, 
 		return nil, err
 	}
 	return &a, nil
+}
+
+func GetByUuid(session *gocql.Session, accountUuid string) (*Account, error) {
+	stmt, names := qb.Select(TableName).Where(qb.Eq("account_uuid")).ToCql()
+	if uuid, err := gocql.ParseUUID(accountUuid); err != nil {
+		return nil, errors.New("invalid account id")
+	} else {
+		q := gocqlx.Query(session.Query(stmt), names).BindStruct(Account{
+			AccountUUID: uuid,
+		})
+		var a Account
+		if err := q.GetRelease(&a); err != nil {
+			return nil, err
+		}
+		return &a, nil
+	}
 }
 
 func DeleteAccount(session *gocql.Session, accountUuid string) error {

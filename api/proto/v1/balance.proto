@@ -1,0 +1,15 @@
+syntax = "proto3";
+package v1;
+
+message GetBalanceRequest {
+    string account_uuid = 1;
+}
+
+message GetBalanceResponse {
+    double balance = 1;
+    string currency = 2;
+}
+
+service BalanceService {
+    rpc GetBalance(GetBalanceRequest) returns(GetBalanceResponse);
+}
