@@ -53,6 +53,8 @@ func (s *balanceServiceServer) UpdateBalance(ctx context.Context, req *v1.Update
 			return nil, status.Errorf(codes.Unknown, "Get: %v", err)
 		} else if req.Currency != a.Currency {
 			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("Invalid currency, expected \"%s\"", a.Currency))
+		} else if a.Balance+req.Balance < 0 {
+			return nil, status.Errorf(codes.InvalidArgument, "Balance cannot be negative")
 		} else if err := account.SetSolde(s.dbSession, req.AccountUuid, a.Balance+req.Balance); err != nil {
 			return nil, status.Errorf(codes.Unknown, "Unable to update the balance")
 		} else {

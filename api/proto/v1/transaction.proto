@@ -19,6 +19,19 @@ message ListTransactionResponse {
     repeated Transaction transaction = 1;
 }
 
+message TransactionRequest {
+    string account_dest_uuid = 1;
+    string account_src_uuid = 2;
+    string note = 3;
+    double amount = 4;
+    string currency = 5;
+}
+
+message TransactionResponse {
+    string transaction_uuid = 1;
+}
+
 service TransactionService {
     rpc ListTransaction(ListTransactionRequest) returns(ListTransactionResponse);
+    rpc Transaction(TransactionRequest) returns(TransactionResponse);
 }

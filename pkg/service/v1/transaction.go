@@ -15,13 +15,13 @@ import (
 )
 
 type transactionServiceServer struct {
-	dbSession *gocql.Session
+	dbSession     *gocql.Session
 	balanceClient v1.BalanceServiceClient
 }
 
 func NewTransactionServiceServer(session *gocql.Session, conn *grpc.ClientConn) v1.TransactionServiceServer {
 	return &transactionServiceServer{
-		dbSession: session,
+		dbSession:     session,
 		balanceClient: v1.NewBalanceServiceClient(conn),
 	}
 }
@@ -56,4 +56,35 @@ func (s *transactionServiceServer) ListTransaction(ctx context.Context, req *v1.
 			}, nil
 		}
 	}
+}
+
+func (s *transactionServiceServer) recreditUser(ctx context.Context, accountDest, currency string, amount float64) {
+	_, _ = s.balanceClient.UpdateBalance(ctx, &v1.UpdateBalanceRequest{
+		AccountUuid: accountDest,
+		Balance:     amount,
+		Currency:    currency,
+	})
+}
+
+func (s *transactionServiceServer) Transaction(ctx context.Context, req *v1.TransactionRequest) (*v1.TransactionResponse, error) {
+	if req.Amount < 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Amount cannot be negative")
+	}
+	if _, err := s.balanceClient.UpdateBalance(ctx, &v1.UpdateBalanceRequest{
+		AccountUuid: req.AccountSrcUuid,
+		Balance:     -req.Amount,
+		Currency:    req.Currency,
+	}); err != nil {
+		return nil, err
+	} else if _, err := s.balanceClient.UpdateBalance(ctx, &v1.UpdateBalanceRequest{
+		AccountUuid: req.AccountDestUuid,
+		Balance:     req.Amount,
+		Currency:    req.Currency,
+	}); err != nil {
+		s.recreditUser(ctx, req.AccountSrcUuid, req.Currency, req.Amount)
+		return nil, err
+	}
+	return &v1.TransactionResponse{
+		TransactionUuid: "",
+	}, nil
 }
