@@ -45,7 +45,7 @@ func GetListTransaction(session *gocql.Session, accountUuid string) ([]Transacti
 		var transactions []Transaction
 		q := gocqlx.Query(session.Query(stmt), names).BindStruct(Transaction{
 			AccountDestUuid: uuid,
-			AccountSrcUuid: uuid,
+			AccountSrcUuid:  uuid,
 		})
 		if err := q.SelectRelease(&transactions); err != nil {
 			return nil, err

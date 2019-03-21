@@ -97,7 +97,7 @@ func SetSolde(session *gocql.Session, accountUuid string, value float64) error {
 	} else {
 		q := gocqlx.Query(session.Query(stmt), names).BindStruct(Account{
 			AccountUUID: uuid,
-			Balance: value,
+			Balance:     value,
 		})
 		return q.Exec()
 	}

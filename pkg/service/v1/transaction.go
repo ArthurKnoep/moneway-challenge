@@ -42,10 +42,10 @@ func (s *transactionServiceServer) ListTransaction(ctx context.Context, req *v1.
 				ts.Nanos = int32(elem.Timestamp.UnixNano())
 				ret = append(ret, &v1.ListTransactionResponse_Transaction{
 					TransactionUuid: elem.TransactionUuid.String(),
-					Timestamp: &ts,
-					Note: elem.Note,
-					Amount: elem.Amount,
-					Currency: elem.Currency,
+					Timestamp:       &ts,
+					Note:            elem.Note,
+					Amount:          elem.Amount,
+					Currency:        elem.Currency,
 				})
 			}
 			return &v1.ListTransactionResponse{
