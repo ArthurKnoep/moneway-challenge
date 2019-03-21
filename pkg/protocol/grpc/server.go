@@ -29,6 +29,6 @@ func RunServer(ctx context.Context, account v1.AccountServiceServer, balance v1.
 			<-ctx.Done()
 		}
 	}()
-	log.Println("starting server....")
+	log.Printf("starting server (port: %s)....", port)
 	return server.Serve(listen)
 }
