@@ -2,6 +2,6 @@
 vendor
 pkg/api
 
-account
-balance
-transaction
+/account
+/balance
+/transaction
