@@ -5,8 +5,8 @@ import (
 
 	"github.com/caarlos0/env"
 
-	"github.com/ArthurKnoep/moneway-challenge/lib/database"
-	"github.com/ArthurKnoep/moneway-challenge/pkg/cmd/server/config"
+	"github.com/ArthurKnoep/moneway-challenge/pkg/cmd/balance/config"
+	"github.com/ArthurKnoep/moneway-challenge/pkg/cmd/balance/database"
 	"github.com/ArthurKnoep/moneway-challenge/pkg/protocol/grpc/balance"
 	"github.com/ArthurKnoep/moneway-challenge/pkg/service/v1"
 )
@@ -22,5 +22,5 @@ func RunServer() error {
 	defer session.Close()
 	return balance.RunServer(ctx,
 		v1.NewBalanceServiceServer(session),
-		cfg.Port)
+		cfg.BalancePort)
 }

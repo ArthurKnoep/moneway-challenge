@@ -5,8 +5,8 @@ import (
 
 	"github.com/caarlos0/env"
 
-	"github.com/ArthurKnoep/moneway-challenge/lib/database"
-	"github.com/ArthurKnoep/moneway-challenge/pkg/cmd/server/config"
+	"github.com/ArthurKnoep/moneway-challenge/pkg/cmd/transaction/config"
+	"github.com/ArthurKnoep/moneway-challenge/pkg/cmd/transaction/database"
 	"github.com/ArthurKnoep/moneway-challenge/pkg/protocol/grpc/transaction"
 	"github.com/ArthurKnoep/moneway-challenge/pkg/service/v1"
 )
@@ -22,5 +22,5 @@ func RunServer() error {
 	defer session.Close()
 	return transaction.RunServer(ctx,
 		v1.NewTransactionServiceServer(session),
-		cfg.Port)
+		cfg.TransactionPort)
 }
