@@ -10,6 +10,18 @@ message GetBalanceResponse {
     string currency = 2;
 }
 
+message UpdateBalanceRequest {
+    string account_uuid = 1;
+    double balance = 2;
+    string currency = 3;
+}
+
+message UpdateBalanceResponse {
+    double balance = 1;
+    string currency = 2;
+}
+
 service BalanceService {
     rpc GetBalance(GetBalanceRequest) returns(GetBalanceResponse);
+    rpc UpdateBalance(UpdateBalanceRequest) returns(UpdateBalanceResponse);
 }
