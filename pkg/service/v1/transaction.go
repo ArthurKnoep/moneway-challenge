@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ArthurKnoep/moneway-challenge/lib/database/models/transaction"
 	"github.com/golang/protobuf/ptypes/timestamp"
+	"google.golang.org/grpc"
 
 	"github.com/gocql/gocql"
 	"google.golang.org/grpc/codes"
@@ -15,11 +16,13 @@ import (
 
 type transactionServiceServer struct {
 	dbSession *gocql.Session
+	balanceClient v1.BalanceServiceClient
 }
 
-func NewTransactionServiceServer(session *gocql.Session) v1.TransactionServiceServer {
+func NewTransactionServiceServer(session *gocql.Session, conn *grpc.ClientConn) v1.TransactionServiceServer {
 	return &transactionServiceServer{
 		dbSession: session,
+		balanceClient: v1.NewBalanceServiceClient(conn),
 	}
 }
 
