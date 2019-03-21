@@ -8,3 +8,11 @@ The configuration is set from environment variables
 | PORT  |  8080  |  Port used by the gRPC server  |
 | DB_KEYSPACE  | moneway |  The keyspace used by the ScyllaDB  |
 | DB_HOST | 127.0.0.1 |  ScyllaDB host  |
+
+
+## Run
+```bash
+dep ensure
+./script/gen-protoc.sh
+go build -o moneway cmd/server/main.go
+```
