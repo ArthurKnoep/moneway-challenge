@@ -7,9 +7,9 @@ import (
 	"github.com/ArthurKnoep/moneway-challenge/pkg/cmd/server/config"
 )
 
-func connect(keyspace string) *gocql.Session {
-	cluster := gocql.NewCluster("127.0.0.1")
-	cluster.Keyspace = keyspace
+func connect(cfg *config.Config) *gocql.Session {
+	cluster := gocql.NewCluster(cfg.DatabaseHost)
+	cluster.Keyspace = cfg.DatabaseKeyspace
 	cluster.Consistency = gocql.Quorum
 	if session, err := cluster.CreateSession(); err != nil {
 		panic(err)
@@ -19,7 +19,7 @@ func connect(keyspace string) *gocql.Session {
 }
 
 func Init(cfg *config.Config) *gocql.Session {
-	session := connect(cfg.DatabaseKeyspace)
+	session := connect(cfg)
 	if err := account.CreateTable(session); err != nil {
 		panic(err)
 	}
