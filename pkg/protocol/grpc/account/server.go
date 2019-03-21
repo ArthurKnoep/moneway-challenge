@@ -6,7 +6,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	
+
 	"google.golang.org/grpc"
 
 	"github.com/ArthurKnoep/moneway-challenge/pkg/api/v1"
