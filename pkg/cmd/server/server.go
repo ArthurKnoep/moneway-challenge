@@ -24,5 +24,6 @@ func RunServer() error {
 	return grpc.RunServer(ctx,
 		v1.NewAccountServiceServer(session),
 		v1.NewBalanceServiceServer(session),
+		v1.NewTransactionServiceServer(session),
 		cfg.Port)
 }

@@ -1,0 +1,24 @@
+syntax = "proto3";
+package v1;
+
+import "google/protobuf/timestamp.proto";
+
+message ListTransactionRequest {
+    string account_uuid = 1;
+}
+
+message ListTransactionResponse {
+    message Transaction {
+        string transaction_uuid = 1;
+        google.protobuf.Timestamp timestamp = 2;
+        string note = 3;
+        double amount = 4;
+        string currency = 5;
+    }
+
+    repeated Transaction transaction = 1;
+}
+
+service TransactionService {
+    rpc ListTransaction(ListTransactionRequest) returns(ListTransactionResponse);
+}

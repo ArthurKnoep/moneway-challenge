@@ -11,6 +11,7 @@ import (
 
 var TableName = "account"
 
+// Database model
 type Account struct {
 	AccountUUID gocql.UUID `db:"account_uuid"`
 	Username    string     `db:"username"`
@@ -86,6 +87,19 @@ func GetByUuid(session *gocql.Session, accountUuid string) (*Account, error) {
 			return nil, err
 		}
 		return &a, nil
+	}
+}
+
+func SetSolde(session *gocql.Session, accountUuid string, value float64) error {
+	stmt, names := qb.Update(TableName).Set("balance").Where(qb.Eq("account_uuid")).ToCql()
+	if uuid, err := gocql.ParseUUID(accountUuid); err != nil {
+		return errors.New("invalid account id")
+	} else {
+		q := gocqlx.Query(session.Query(stmt), names).BindStruct(Account{
+			AccountUUID: uuid,
+			Balance: value,
+		})
+		return q.Exec()
 	}
 }
 
