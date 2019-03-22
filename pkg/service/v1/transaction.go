@@ -84,7 +84,15 @@ func (s *transactionServiceServer) Transaction(ctx context.Context, req *v1.Tran
 		s.recreditUser(ctx, req.AccountSrcUuid, req.Currency, req.Amount)
 		return nil, err
 	}
-	return &v1.TransactionResponse{
-		TransactionUuid: "",
-	}, nil
+	if rest, err := transaction.AddTransaction(s.dbSession, req.AccountSrcUuid, req.AccountDestUuid, &transaction.Transaction{
+		Note:     req.Note,
+		Amount:   req.Amount,
+		Currency: req.Currency,
+	}); err != nil {
+		return nil, status.Errorf(codes.Unknown, err.Error())
+	} else {
+		return &v1.TransactionResponse{
+			TransactionUuid: rest.TransactionUuid.String(),
+		}, nil
+	}
 }

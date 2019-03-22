@@ -28,7 +28,7 @@ func CreateTable(session *gocql.Session) error {
 		"account_dest_uuid uuid,"+
 		"account_src_uuid uuid,"+
 		"timestamp timestamp,"+
-		"node text,"+
+		"note text,"+
 		"amount double,"+
 		"currency varchar"+
 		")", TableName)
@@ -52,5 +52,25 @@ func GetListTransaction(session *gocql.Session, accountUuid string) ([]Transacti
 		} else {
 			return transactions, nil
 		}
+	}
+}
+
+func AddTransaction(session *gocql.Session, src, dest string, transaction *Transaction) (*Transaction, error) {
+	transaction.Timestamp = time.Now()
+	transaction.TransactionUuid = gocql.TimeUUID()
+	if srcUuid, err := gocql.ParseUUID(src); err != nil {
+		return nil, errors.New("invalid source id")
+	} else if destUuid, err := gocql.ParseUUID(dest); err != nil {
+		return nil, errors.New("invalid dest id")
+	} else {
+		transaction.AccountSrcUuid = srcUuid
+		transaction.AccountDestUuid = destUuid
+		stmt, names := qb.Insert(TableName).Columns("transaction_uuid", "account_dest_uuid", "account_src_uuid",
+			"timestamp", "note", "amount", "currency").ToCql()
+		q := gocqlx.Query(session.Query(stmt), names).BindStruct(transaction)
+		if err := q.ExecRelease(); err != nil {
+			return nil, err
+		}
+		return transaction, err
 	}
 }
