@@ -1,17 +1,19 @@
 syntax = "proto3";
 package v1;
 
+// Create a bank account
 message CreateRequest {
-    string username = 1;
-    string currency = 2;
+    string username = 1; // Name of the account
+    string currency = 2; // 3 characters currency (example: EUR, USD, BTC)
 }
 
 message CreateResponse {
-    string account_uuid = 1;
+    string account_uuid = 1; // Uuid of the new account
 }
 
+// Delete a bank account
 message DeleteRequest {
-    string account_uuid = 1;
+    string account_uuid = 1; // Uuid of the account
 }
 
 message DeleteResponse {

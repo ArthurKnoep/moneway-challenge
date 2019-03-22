@@ -1,24 +1,26 @@
 syntax = "proto3";
 package v1;
 
+// Get the balance value for an account
 message GetBalanceRequest {
-    string account_uuid = 1;
+    string account_uuid = 1; // Uuid of the account
 }
 
 message GetBalanceResponse {
-    double balance = 1;
-    string currency = 2;
+    double balance = 1; // Current balance
+    string currency = 2; // Currency of the account
 }
 
+// Update the balance of an account using a relative value
 message UpdateBalanceRequest {
-    string account_uuid = 1;
-    double balance = 2;
-    string currency = 3;
+    string account_uuid = 1; // Uuid of the account
+    double balance = 2; // Relative balance
+    string currency = 3; // Currency of the transaction
 }
 
 message UpdateBalanceResponse {
-    double balance = 1;
-    string currency = 2;
+    double balance = 1; // New balance of the account
+    string currency = 2; // Currency of the account
 }
 
 service BalanceService {

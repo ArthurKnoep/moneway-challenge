@@ -3,8 +3,9 @@ package v1;
 
 import "google/protobuf/timestamp.proto";
 
+// List transaction for an account
 message ListTransactionRequest {
-    string account_uuid = 1;
+    string account_uuid = 1; // Account UUID
 }
 
 message ListTransactionResponse {
@@ -19,21 +20,23 @@ message ListTransactionResponse {
     repeated Transaction transaction = 1;
 }
 
+// Create a transaction between two account
 message TransactionRequest {
-    string account_dest_uuid = 1;
-    string account_src_uuid = 2;
-    string note = 3;
-    double amount = 4;
-    string currency = 5;
+    string account_dest_uuid = 1; // UUID of the destination account
+    string account_src_uuid = 2; // UUID of the source account
+    string note = 3; // *optional Note
+    double amount = 4; // Amount of the transaction
+    string currency = 5; // Currency of the transaction
 }
 
 message TransactionResponse {
-    string transaction_uuid = 1;
+    string transaction_uuid = 1; // UUID of the transaction
 }
 
+// Update a transaction
 message UpdateTransactionRequest {
-    string transaction_uuid = 1;
-    string note = 2;
+    string transaction_uuid = 1; // Transaction UUID
+    string note = 2; // New note
 }
 
 message UpdateTransactionResponse {
