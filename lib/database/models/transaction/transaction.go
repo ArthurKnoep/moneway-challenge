@@ -74,3 +74,30 @@ func AddTransaction(session *gocql.Session, src, dest string, transaction *Trans
 		return transaction, err
 	}
 }
+
+func UpdateTransaction(session *gocql.Session, transactionUuid, note string) (*Transaction, error) {
+	stmt, names := qb.Select(TableName).Where(qb.Eq("transaction_uuid")).ToCql()
+	if uuid, err := gocql.ParseUUID(transactionUuid); err != nil {
+		return nil, errors.New("invalid transaction id")
+	} else {
+		var transaction Transaction
+		q := gocqlx.Query(session.Query(stmt), names).BindStruct(Transaction{
+			TransactionUuid: uuid,
+		})
+		if err := q.GetRelease(&transaction); err != nil {
+			return nil, err
+		} else {
+			transaction.Note = note
+			stmt, names := qb.Update(TableName).Set("note").Where(qb.Eq("transaction_uuid")).ToCql()
+			q := gocqlx.Query(session.Query(stmt), names).BindStruct(Transaction{
+				TransactionUuid: uuid,
+				Note: note,
+			})
+			if err := q.ExecRelease(); err != nil {
+				return nil, err
+			} else {
+				return &transaction, nil
+			}
+		}
+	}
+}

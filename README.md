@@ -14,5 +14,5 @@ The configuration is set from environment variables
 ```bash
 dep ensure
 ./script/gen-protoc.sh
-go build -o moneway cmd/server/main.go
+./script/build.sh
 ```

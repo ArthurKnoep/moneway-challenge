@@ -31,7 +31,16 @@ message TransactionResponse {
     string transaction_uuid = 1;
 }
 
+message UpdateTransactionRequest {
+    string transaction_uuid = 1;
+    string note = 2;
+}
+
+message UpdateTransactionResponse {
+}
+
 service TransactionService {
     rpc ListTransaction(ListTransactionRequest) returns(ListTransactionResponse);
     rpc Transaction(TransactionRequest) returns(TransactionResponse);
+    rpc UpdateTransaction(UpdateTransactionRequest) returns(UpdateTransactionResponse);
 }

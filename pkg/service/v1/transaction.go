@@ -96,3 +96,10 @@ func (s *transactionServiceServer) Transaction(ctx context.Context, req *v1.Tran
 		}, nil
 	}
 }
+
+func (s *transactionServiceServer) UpdateTransaction(ctx context.Context, req *v1.UpdateTransactionRequest) (*v1.UpdateTransactionResponse, error) {
+	if _, err := transaction.UpdateTransaction(s.dbSession, req.TransactionUuid, req.Note); err != nil {
+		return nil, status.Errorf(codes.Unknown, err.Error())
+	}
+	return &v1.UpdateTransactionResponse{}, nil
+}
