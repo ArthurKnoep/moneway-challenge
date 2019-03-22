@@ -3,10 +3,12 @@ package transaction
 import (
 	"errors"
 	"fmt"
+	"sort"
+	"time"
+	
 	"github.com/gocql/gocql"
 	"github.com/scylladb/gocqlx"
 	"github.com/scylladb/gocqlx/qb"
-	"time"
 )
 
 var TableName = "transaction"
@@ -37,21 +39,63 @@ func CreateTable(session *gocql.Session) error {
 	return q.Exec()
 }
 
-func GetListTransaction(session *gocql.Session, accountUuid string) ([]Transaction, error) {
-	stmt, names := qb.Select(TableName).Where(qb.Eq("account_dest_uuid"), qb.Eq("account_src_uuid")).AllowFiltering().ToCql()
+func getListTransacOut(session *gocql.Session, accountUuid string) ([]Transaction, error) {
+	stmt, names := qb.Select(TableName).Where(qb.Eq("account_src_uuid")).AllowFiltering().ToCql()
+	if uuid, err := gocql.ParseUUID(accountUuid); err != nil {
+		return nil, errors.New("invalid account id")
+	} else {
+		var transactions []Transaction
+		q := gocqlx.Query(session.Query(stmt), names).BindStruct(Transaction{
+			AccountSrcUuid:  uuid,
+		})
+		if err := q.SelectRelease(&transactions); err != nil {
+			return nil, err
+		} else {
+			var ret []Transaction
+			for _, elem := range transactions {
+				elem.Amount = -elem.Amount
+				ret = append(ret, elem)
+			}
+			return ret, nil
+		}
+	}
+}
+
+func getListTransacIn(session *gocql.Session, accountUuid string) ([]Transaction, error) {
+	stmt, names := qb.Select(TableName).Where(qb.Eq("account_dest_uuid")).AllowFiltering().ToCql()
 	if uuid, err := gocql.ParseUUID(accountUuid); err != nil {
 		return nil, errors.New("invalid account id")
 	} else {
 		var transactions []Transaction
 		q := gocqlx.Query(session.Query(stmt), names).BindStruct(Transaction{
 			AccountDestUuid: uuid,
-			AccountSrcUuid:  uuid,
 		})
 		if err := q.SelectRelease(&transactions); err != nil {
 			return nil, err
 		} else {
 			return transactions, nil
 		}
+	}
+}
+
+type ByTimestamp []Transaction
+
+func (a ByTimestamp) Len() int           { return len(a) }
+func (a ByTimestamp) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByTimestamp) Less(i, j int) bool { return a[i].Timestamp.Second() < a[j].Timestamp.Second() }
+
+func GetListTransaction(session *gocql.Session, accountUuid string) ([]Transaction, error) {
+	if out, err := getListTransacOut(session, accountUuid); err != nil {
+		return nil, err
+	} else if in, err := getListTransacIn(session, accountUuid); err != nil {
+		return nil, err
+	} else {
+		var ret []Transaction
+		ret = append(out, in...)
+		sort.Slice(ret, func(a, b int) bool {
+			return ret[a].Timestamp.Second() > ret[b].Timestamp.Second()
+		})
+		return ret, nil
 	}
 }
 
