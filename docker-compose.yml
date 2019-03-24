@@ -2,6 +2,7 @@ version: '3'
 services:
   db:
     build: ./lib/database/docker
+    restart: always
     healthcheck:
       test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
       interval: 10s
