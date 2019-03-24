@@ -27,6 +27,19 @@ dep ensure
 ./script/build.sh
 ```
 
+### Docker
+A docker compose file is available
+```bash
+docker-compose build
+docker-compose up
+```
+
+```bash
+docker build -f cmd/account/Dockerfile .      # Acount service
+docker build -f cmd/balance/Dockerfile .      # Balance service
+docker build -f cmd/transaction/Dockerfile .  # Transaction service
+```
+
 ## Services
 ### Account
 This service allow the creation or the deletion of bank account
